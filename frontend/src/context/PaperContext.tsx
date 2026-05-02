@@ -7,7 +7,7 @@ import { Paper } from '@/types';
 interface PaperContextType {
   papers: Paper[];
   isLoading: boolean;
-  createPaper: (paperData: Omit<Paper, 'id' | 'createdAt' | 'updatedAt' | 'userId'>) => Paper;
+  createPaper: (paperData: Omit<Paper, 'id' | 'author' | 'authorId' | 'status' | 'createdAt' | 'updatedAt' | 'views' | 'downloads' | 'tags'>) => Paper;
   getPaperById: (id: string) => Paper | undefined;
   deletePaper: (id: string) => void;
   stats: {
@@ -52,7 +52,7 @@ export function PaperProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const createPaper = (paperData: Omit<Paper, 'id' | 'createdAt' | 'updatedAt' | 'author' | 'authorId' | 'views' | 'downloads' | 'tags'>) => {
+  const createPaper = (paperData: Omit<Paper, 'id' | 'author' | 'authorId' | 'status' | 'createdAt' | 'updatedAt' | 'views' | 'downloads' | 'tags'>) => {
     if (!user) throw new Error('User must be logged in to create a paper');
 
     const newPaper: Paper = {
