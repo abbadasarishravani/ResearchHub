@@ -98,8 +98,8 @@ export function PaperProvider({ children }: { children: React.ReactNode }) {
 
   const stats = {
     total: papers.length,
-    underReview: papers.filter((p) => p.status === 'UNDER_REVIEW' || p.status === 'REVIEWED').length,
-    published: papers.filter((p) => p.status === 'PUBLISHED').length,
+    underReview: papers.filter((p) => p.status === 'under-review' || p.status === 'submitted').length,
+    published: papers.filter((p) => p.status === 'accepted').length,
   };
 
   return (
