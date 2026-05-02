@@ -1,0 +1,13 @@
+
+> krud@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.182.114.106:3000
+- Environments: .env
+✓ Ready in 723ms
+Creating turbopack project { dir: 'C:\\Users\\Hi\\Desktop\\krud\\frontend', testMode: true }
+
+○ Compiling / ...
+✓ Finished writing to filesystem cache in 21.0s

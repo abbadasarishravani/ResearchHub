@@ -1,31 +1,54 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const connectDB = require('./lib/mongodb');
-const paperRoutes = require('./routes/paper.routes');
-
-// Load environment variables
+import dotenv from 'dotenv';
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
+import express from 'express';
+import cors from 'cors';
+import authRoutes from './routes/auth.js';
+import repositoryRoutes from './routes/repositories.js';
+import codeReviewRoutes from './routes/codeReviews.js';
+import commentRoutes from './routes/comments.js';
+import suggestionRoutes from './routes/suggestions.js';
+import prisma from './utils/prisma.js';
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/api/papers', paperRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/repositories', repositoryRoutes);
+app.use('/api/code-reviews', codeReviewRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/suggestions', suggestionRoutes);
 
-// Basic route for testing
-app.get('/', (req, res) => {
-  res.send('API is running...');
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Server is running' });
 });
 
-const PORT = process.env.PORT || 5000;
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    error: {
+      message: err.message || 'Internal Server Error',
+      status: err.status || 500
+    }
+  });
+});
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
+  (async () => {
+    try {
+      await prisma.$connect();
+      console.log('Successfully connected to MongoDB');
+    } catch (error) {
+      console.error('Failed to connect to MongoDB:', error);
+    }
+  })();
 });
