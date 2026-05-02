@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  email         String    @unique
+  name          String?
+  password      String
+  githubProfile String?
+  linkedinProfile String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  repositories  Repository[]
+  codeReviews   CodeReview[]
+  comments      Comment[]
+}
+
+model Repository {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  url         String
+  language    String
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeReviews CodeReview[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CodeReview {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  codeSnippet  String
+  language     String
+  status       ReviewStatus @default(PENDING)
+  aiAnalysis   Json?
+  userId       String       @db.ObjectId
+  repositoryId String       @db.ObjectId
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repository   Repository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  comments     Comment[]
+  suggestions  Suggestion[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Comment {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  content      String
+  userId       String      @db.ObjectId
+  codeReviewId String      @db.ObjectId
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeReview   CodeReview  @relation(fields: [codeReviewId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Suggestion {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  type         SuggestionType
+  content      String
+  lineNumbers  Int[]
+  severity     Severity
+  codeReviewId String      @db.ObjectId
+  codeReview   CodeReview  @relation(fields: [codeReviewId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+}
+
+enum ReviewStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+enum SuggestionType {
+  BUG
+  PERFORMANCE
+  SECURITY
+  STYLE
+  BEST_PRACTICE
+  DOCUMENTATION
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
