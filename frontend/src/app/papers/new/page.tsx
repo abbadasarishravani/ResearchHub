@@ -57,7 +57,7 @@ export default function NewPaperPage() {
         abstract: formData.abstract,
         content: formData.content,
         category: formData.category,
-      });
+      } as any);
 
       router.push('/papers');
     } catch (err) {

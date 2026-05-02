@@ -2,12 +2,20 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { Paper } from '@/types';
+import { Paper, PaperCategory } from '@/types';
+
+// Explicitly define the input type to avoid Omit issues during build
+export interface CreatePaperInput {
+  title: string;
+  abstract: string;
+  content: string;
+  category: PaperCategory;
+}
 
 interface PaperContextType {
   papers: Paper[];
   isLoading: boolean;
-  createPaper: (paperData: Omit<Paper, 'id' | 'author' | 'authorId' | 'status' | 'createdAt' | 'updatedAt' | 'views' | 'downloads' | 'tags'>) => Paper;
+  createPaper: (paperData: CreatePaperInput) => Paper;
   getPaperById: (id: string) => Paper | undefined;
   deletePaper: (id: string) => void;
   stats: {
@@ -52,7 +60,7 @@ export function PaperProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const createPaper = (paperData: Omit<Paper, 'id' | 'author' | 'authorId' | 'status' | 'createdAt' | 'updatedAt' | 'views' | 'downloads' | 'tags'>) => {
+  const createPaper = (paperData: CreatePaperInput) => {
     if (!user) throw new Error('User must be logged in to create a paper');
 
     const newPaper: Paper = {
