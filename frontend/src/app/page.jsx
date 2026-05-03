@@ -1,4 +1,5 @@
 'use client';
+// Trigger build for Vercel Root Directory fix
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
