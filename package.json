@@ -1,4 +1,11 @@
 {
+  "name": "krud-root",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "start": "npm run start --prefix frontend"
+  },
   "dependencies": {
     "framer-motion": "^12.38.0"
   }
