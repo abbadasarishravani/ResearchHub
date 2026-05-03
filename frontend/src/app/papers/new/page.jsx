@@ -42,10 +42,7 @@ export default function NewPaperPage() {
             return;
         setIsLoading(true);
         try {
-            // Simulate API lag
-            await new Promise((resolve) => setTimeout(resolve, 800));
-            // @ts-ignore
-            createPaper({
+            await createPaper({
                 title: formData.title,
                 abstract: formData.abstract,
                 content: formData.content,

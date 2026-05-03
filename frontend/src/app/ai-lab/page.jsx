@@ -115,27 +115,29 @@ export default function AILabPage() {
           {/* Features Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, i) => (<motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                <Card className="h-full hover:border-accent transition-all duration-300 group cursor-pointer">
-                  <CardContent className="p-8 space-y-6">
-                    <div className={`w-14 h-14 rounded-2xl ${feature.color} flex items-center justify-center transition-transform group-hover:scale-110 duration-300`}>
-                      <feature.icon className="w-7 h-7"/>
-                    </div>
-                    <div className="space-y-3">
-                      <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors">
-                        {feature.title}
-                      </h3>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {feature.description}
-                      </p>
-                    </div>
-                    <div className="pt-4 flex items-center justify-between border-t border-border">
-                      <Badge variant="secondary">{feature.stats}</Badge>
-                      <span className="text-accent text-sm font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Launch <ArrowRight className="w-4 h-4"/>
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+                <Link href="/papers/new">
+                  <Card className="h-full hover:border-accent transition-all duration-300 group cursor-pointer">
+                    <CardContent className="p-8 space-y-6">
+                      <div className={`w-14 h-14 rounded-2xl ${feature.color} flex items-center justify-center transition-transform group-hover:scale-110 duration-300`}>
+                        <feature.icon className="w-7 h-7"/>
+                      </div>
+                      <div className="space-y-3">
+                        <h3 className="text-xl font-bold text-foreground group-hover:text-accent transition-colors">
+                          {feature.title}
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {feature.description}
+                        </p>
+                      </div>
+                      <div className="pt-4 flex items-center justify-between border-t border-border">
+                        <Badge variant="secondary">{feature.stats}</Badge>
+                        <span className="text-accent text-sm font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          Launch <ArrowRight className="w-4 h-4"/>
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>))}
           </div>
 

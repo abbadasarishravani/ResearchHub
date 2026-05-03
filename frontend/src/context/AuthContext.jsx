@@ -1,25 +1,41 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
 const AuthContext = createContext(undefined);
+
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://researchhub-nyui.onrender.com';
+
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        const isAuth = localStorage.getItem('isAuthenticated');
-        if (storedUser && isAuth === 'true') {
-            try {
-                setUser(JSON.parse(storedUser));
+        const checkAuth = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const response = await fetch(`${API_URL}/api/auth/profile`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const userData = await response.json();
+                        setUser(userData);
+                    } else {
+                        logout();
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch profile:', error);
+                }
             }
-            catch (e) {
-                console.error('Failed to parse user from localStorage');
-                logout();
-            }
-        }
-        setIsLoading(false);
-    }, []);
+            setIsLoading(false);
+        };
+        checkAuth();
+    }, [API_URL]);
+
     const login = (userData, token) => {
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
@@ -28,6 +44,7 @@ export function AuthProvider({ children }) {
             localStorage.setItem('token', token);
         }
     };
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('user');
@@ -35,13 +52,15 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('token');
         router.push('/');
     };
-    const updateProfile = (userData) => {
+
+    const updateProfile = async (userData) => {
         if (user) {
             const updatedUser = { ...user, ...userData };
             setUser(updatedUser);
             localStorage.setItem('user', JSON.stringify(updatedUser));
         }
     };
+
     return (<AuthContext.Provider value={{
             user,
             isAuthenticated: !!user,
@@ -49,10 +68,12 @@ export function AuthProvider({ children }) {
             logout,
             updateProfile,
             isLoading,
+            API_URL
         }}>
       {children}
     </AuthContext.Provider>);
 }
+
 export function useAuth() {
     const context = useContext(AuthContext);
     if (context === undefined) {

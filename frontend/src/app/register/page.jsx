@@ -11,7 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Navbar } from '@/components/navbar';
 export default function RegisterPage() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { login, API_URL } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -60,18 +60,33 @@ export default function RegisterPage() {
             return;
         setIsLoading(true);
         try {
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            const newUser = {
-                name: formData.name,
-                email: formData.email,
-                role: formData.role.charAt(0).toUpperCase() + formData.role.slice(1),
-            };
-            login(newUser);
-            router.push('/');
+            const response = await fetch(`${API_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password,
+                    // Additional fields if needed by backend
+                    githubProfile: `https://github.com/${formData.name.replace(/\s+/g, '').toLowerCase()}`,
+                    linkedinProfile: `https://linkedin.com/in/${formData.name.replace(/\s+/g, '').toLowerCase()}`,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                login(data.user, data.token);
+                router.push('/');
+            } else {
+                setError(data.error?.message || 'Registration failed. Please try again.');
+            }
         }
         catch (err) {
-            setError('Registration failed. Please try again.');
+            console.error('Registration error:', err);
+            setError('Registration failed. Please check your connection.');
         }
         finally {
             setIsLoading(false);

@@ -11,7 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Navbar } from '@/components/navbar';
 export default function LoginPage() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { login, API_URL } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -37,10 +37,6 @@ export default function LoginPage() {
             setError('Please enter a valid email');
             return false;
         }
-        if (formData.password.length < 6) {
-            setError('Password must be at least 6 characters');
-            return false;
-        }
         return true;
     };
     const handleSubmit = async (e) => {
@@ -49,21 +45,32 @@ export default function LoginPage() {
             return;
         setIsLoading(true);
         try {
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            const mockUser = {
-                name: formData.email.split('@')[0].charAt(0).toUpperCase() + formData.email.split('@')[0].slice(1),
-                email: formData.email,
-                role: 'Researcher'
-            };
-            login(mockUser);
-            if (formData.rememberMe) {
-                localStorage.setItem('rememberMe', 'true');
+            const response = await fetch(`${API_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                login(data.user, data.token);
+                if (formData.rememberMe) {
+                    localStorage.setItem('rememberMe', 'true');
+                }
+                router.push('/');
+            } else {
+                setError(data.error?.message || 'Login failed. Please check your credentials.');
             }
-            router.push('/');
         }
         catch (err) {
-            setError('Login failed. Please try again.');
+            console.error('Login error:', err);
+            setError('Login failed. Please check your connection.');
         }
         finally {
             setIsLoading(false);
